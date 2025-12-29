@@ -56,7 +56,7 @@ def build_model(seqlen=50, nbr_filters = 160, filter_len = 8, border_mode = 'sam
 
     # This model maps an input to its reconstruction
     autoencoder = keras.Model(inputs=input_data, outputs=[decoded, rl], name="rl_auto-encoder")
-    adam = keras.optimizers.Adam(lr=2e-04, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+    adam = keras.optimizers.Adam(learning_rate=2e-04, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
     losses = loss_functions
     lossWeights = {"rl_output": 1.0, "decoded_output": 5.0}
 

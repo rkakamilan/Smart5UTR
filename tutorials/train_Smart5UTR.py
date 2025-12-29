@@ -10,8 +10,15 @@ from Smart5UTR.train import train_model, finetune_model, test_model
 import tensorflow as tf
 ## set device
 gpus = tf.config.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(gpus[0], True)
-
+# tf.config.experimental.set_memory_growth(gpus[0], True)
+if gpus:
+    try:
+        tf.config.experimental.set_memory_growth(gpus[0], True)
+        print(f"GPU memory growth enabled: {gpus[0]}")
+    except RuntimeError as e:
+        print(f"GPU setting error: {e}")
+else:
+    print("GPU not detected. Running on CPU.")
 
 # Step 1. Train the initial model using the default parameters and data
 train_model(data_path = "../data/GSM3130440_egfp_m1pseudo_2.csv",

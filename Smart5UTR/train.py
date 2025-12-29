@@ -1,7 +1,7 @@
 import tensorflow.keras as keras
 import joblib
 from sklearn import preprocessing
-from .model import build_model, loss_functions
+from .model import build_model, loss_functions, weighted_squared_error
 from .dataloader import RawData, r2
 
 def train_model(data_path = "../data/GSM3130440_egfp_m1pseudo_2.csv",
@@ -52,7 +52,8 @@ def load_MTAE(model_path, scaler_path):
     losses = loss_functions
     autoencoder = keras.models.load_model(
         model_path,
-        compile=False)
+        compile=False,
+        custom_objects={'weighted_squared_error': weighted_squared_error})
     autoencoder.compile(loss=losses,
                 metrics={'rl_output': 'mse', 'decoded_output': 'accuracy'})
     scaler = joblib.load(scaler_path)
@@ -88,9 +89,13 @@ def finetune_model(trained_model_path = "../models/Smart5UTR/Smart5UTR_egfp_m1ps
 
     losses = loss_functions
     lossWeights = {"rl_output": rl_loss_weight, "decoded_output": decoded_loss_weight}
-    adam = keras.optimizers.Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+    adam = keras.optimizers.Adam(learning_rate=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 
-    autoencoder = keras.models.load_model(trained_model_path, compile=False)
+    autoencoder = keras.models.load_model(
+        trained_model_path,
+        compile=False,
+        custom_objects={'weighted_squared_error': weighted_squared_error},
+    )
     autoencoder.compile(optimizer=adam, loss=losses, loss_weights=lossWeights,
                 metrics={'rl_output': 'mse', 'decoded_output': 'accuracy'})
 
