@@ -88,7 +88,8 @@ def split_autoencoder(model):
             necklayer_index = i
 
     # Create the decoder input with the shape found above
-    decoder_input = keras.Input(shape=decoded_input_len)
+    # Keras 3.x requires shape to be a tuple, not an integer
+    decoder_input = keras.Input(shape=(decoded_input_len,))
     de = model.layers[decolayer_index](decoder_input)
     for layer in model.layers[necklayer_index:]:
         de = layer(de)
