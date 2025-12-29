@@ -75,7 +75,11 @@ def split_autoencoder(model):
     for i, layer in enumerate(model.layers):
         if layer.name == 'decoded_input': # Find the 'decoded_input' layer and its input shape
             decolayer_index = i
-            decoded_input_len = layer.input_shape[1]
+            # Keras 3.x compatibility: use input.shape instead of input_shape
+            if hasattr(layer, 'input_shape'):
+                decoded_input_len = layer.input_shape[1]
+            else:
+                decoded_input_len = layer.input.shape[1]
 
             if decoded_input_len is None:
                 raise ValueError("No layer named 'decoded_input' found in the model.")
